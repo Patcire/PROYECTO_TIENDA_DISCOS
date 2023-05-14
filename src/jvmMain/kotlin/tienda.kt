@@ -1,3 +1,4 @@
+import CLASES.Usuario
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import java.sql.DriverManager
 
 @Composable
 @Preview
@@ -52,15 +54,31 @@ fun inicio():String {
     return opcion
 }
 
+
 @Preview
 @Composable
 fun registrar():String {
     var opcion by remember { mutableStateOf("registrar") }
+
     var dni by remember { mutableStateOf("") }
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var contrasenia by remember { mutableStateOf("") }
+
+    //PARA CONECTARSE A ORACLE
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+    Class.forName("oracle.jdbc.driver.OracleDriver")
+    val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+    println("Conexión con ORACLE exitosa")
+
+    val usuario_creado= Usuario(dni, nombre, apellidos, correo, contrasenia)
+     //objeto tipo Usuario con el que vamos a mandar los datos a la BBDD
+
+    //INTERFAZ GRÁFICA de registrar
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
@@ -108,16 +126,35 @@ fun registrar():String {
                 modifier = Modifier.padding(bottom = 6.dp)
             )
             Row() {
-                Button(modifier = Modifier.padding(5.dp),onClick = { opcion= "inicio" },
-                colors= ButtonDefaults.buttonColors(backgroundColor= androidx.compose.ui.graphics.Color.White,
-                    contentColor = androidx.compose.ui.graphics.Color.Black)
-            ) {
-                Text("Enviar")
-            } }
+                Button(
+                    modifier = Modifier.padding(5.dp), onClick = { opcion = "inicio" },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = androidx.compose.ui.graphics.Color.White,
+                        contentColor = androidx.compose.ui.graphics.Color.Black
+                    )
+                ) {
+                    Text("Enviar")
+                }
+            }
         }
-    } //fin box
+    } //fin box, FIN INTERFAZ GRÁFICA
 
+    //SI OPCION CAMBIA A INICIO, entonces es que se ha enviado el formulario y las variables ya no están vacía
+    //y no hay error con la bbdd y los valores nulos
+    if (opcion=="inicio"){
+        val pasar_usuario_basedatos=conexion.prepareStatement("INSERT INTO USUARIOS (dni, nombre, apellidos, " +
+                "correo, contrasenia) VALUES (?, ?, ?, ?, ?)")
+        pasar_usuario_basedatos.setString(1, usuario_creado.dni)
+        pasar_usuario_basedatos.setString(2, usuario_creado.nombre)
+        pasar_usuario_basedatos.setString(3, usuario_creado.apellidos)
+        pasar_usuario_basedatos.setString(4, usuario_creado.correo)
+        pasar_usuario_basedatos.setString(5, usuario_creado.contrasenia)
+        pasar_usuario_basedatos.executeUpdate()
+
+    }
+    conexion.close()
     return opcion
+
 }
 
     @Preview
