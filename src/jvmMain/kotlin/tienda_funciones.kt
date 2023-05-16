@@ -16,9 +16,8 @@ fun registrar_usuario(usuario_recibido: Usuario):Boolean{
         println("Conexión con ORACLE exitosa")
 
         val pasar_usuario_basedatos = conexion.prepareStatement(
-            "INSERT INTO USUARIOS (dni, nombre, apellidos, " +
-                    "correo, contrasenia) VALUES (?, ?, ?, ?, ?)"
-        )
+            "INSERT INTO USUARIOS (dni, nombre, apellidos, correo, contrasenia) VALUES (?, ?, ?, ?, ?) ")
+
         pasar_usuario_basedatos.setString(1, usuario_recibido.dni)
         pasar_usuario_basedatos.setString(2, usuario_recibido.nombre)
         pasar_usuario_basedatos.setString(3, usuario_recibido.apellidos)

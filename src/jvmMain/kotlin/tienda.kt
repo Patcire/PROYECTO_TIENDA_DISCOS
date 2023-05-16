@@ -204,8 +204,6 @@ fun menu_principal(): String{
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
-        //var ancho_maximo=maxWidth.value.toInt()
-        //var altura_maxima=maxHeight.value.toInt()
         Column(
             modifier = Modifier
                 .padding(16.dp)
