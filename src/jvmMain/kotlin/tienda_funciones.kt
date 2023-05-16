@@ -3,6 +3,42 @@ import java.sql.DriverManager
 import java.sql.ResultSet
 import java.sql.SQLException
 
+
+fun registrar_usuario(usuario_recibido: Usuario):Boolean{
+    //PARA CONECTARSE A ORACLE
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+    try {
+        Class.forName("oracle.jdbc.driver.OracleDriver")
+        val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+        println("Conexión con ORACLE exitosa")
+
+        val pasar_usuario_basedatos = conexion.prepareStatement(
+            "INSERT INTO USUARIOS (dni, nombre, apellidos, " +
+                    "correo, contrasenia) VALUES (?, ?, ?, ?, ?)"
+        )
+        pasar_usuario_basedatos.setString(1, usuario_recibido.dni)
+        pasar_usuario_basedatos.setString(2, usuario_recibido.nombre)
+        pasar_usuario_basedatos.setString(3, usuario_recibido.apellidos)
+        pasar_usuario_basedatos.setString(4, usuario_recibido.correo)
+        pasar_usuario_basedatos.setString(5, usuario_recibido.contrasenia)
+        pasar_usuario_basedatos.executeUpdate()
+
+        conexion.close()
+    }
+    catch (e: SQLException) {
+         println("Error en la conexión: ${e.message}")
+    } catch (e: ClassNotFoundException) {
+     println("No se encontró el driver JDBC: ${e.message}")
+    }
+
+    return true
+}
+
+
+
 fun comprobar_usuario(usuario_recibido: Usuario): Boolean{
 
     //Para conectarme a mi bbdd

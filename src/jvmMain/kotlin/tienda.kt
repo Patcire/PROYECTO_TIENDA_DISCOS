@@ -21,7 +21,7 @@ import java.sql.DriverManager
 
 @Composable
 @Preview
-fun inicio():String {
+fun pagina_inicio():String {
     var opcion by remember { mutableStateOf("inicio") }
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
@@ -57,7 +57,7 @@ fun inicio():String {
 
 @Preview
 @Composable
-fun registrar():String {
+fun formulario_registro():String {
     var opcion by remember { mutableStateOf("registrar") }
 
     var dni by remember { mutableStateOf("") }
@@ -66,17 +66,9 @@ fun registrar():String {
     var correo by remember { mutableStateOf("") }
     var contrasenia by remember { mutableStateOf("") }
 
-    //PARA CONECTARSE A ORACLE
-    val url = "jdbc:oracle:thin:@localhost:1521:xe"
-    val mi_usuario = "usuariot"
-    val mi_contra = "tusuario2"
-
-    Class.forName("oracle.jdbc.driver.OracleDriver")
-    val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
-    println("Conexión con ORACLE exitosa")
 
     val usuario_creado= Usuario(dni, nombre, apellidos, correo, contrasenia)
-     //objeto tipo Usuario con el que vamos a mandar los datos a la BBDD
+    //objeto tipo Usuario con el que vamos a mandar los datos a la BBDD
 
     //INTERFAZ GRÁFICA de registrar
     BoxWithConstraints(
@@ -127,7 +119,12 @@ fun registrar():String {
             )
             Row() {
                 Button(
-                    modifier = Modifier.padding(5.dp), onClick = { opcion = "inicio" },
+                    modifier = Modifier.padding(5.dp),
+                    onClick = {
+                        if (registrar_usuario(usuario_creado)==true){
+                            opcion = "inicio"
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = androidx.compose.ui.graphics.Color.White,
                         contentColor = androidx.compose.ui.graphics.Color.Black
@@ -139,20 +136,6 @@ fun registrar():String {
         }
     } //fin box, FIN INTERFAZ GRÁFICA
 
-    //SI OPCION CAMBIA A INICIO, entonces es que se ha enviado el formulario y las variables ya no están vacía
-    //y no hay error con la bbdd y los valores nulos
-    if (opcion=="inicio"){
-        val pasar_usuario_basedatos=conexion.prepareStatement("INSERT INTO USUARIOS (dni, nombre, apellidos, " +
-                "correo, contrasenia) VALUES (?, ?, ?, ?, ?)")
-        pasar_usuario_basedatos.setString(1, usuario_creado.dni)
-        pasar_usuario_basedatos.setString(2, usuario_creado.nombre)
-        pasar_usuario_basedatos.setString(3, usuario_creado.apellidos)
-        pasar_usuario_basedatos.setString(4, usuario_creado.correo)
-        pasar_usuario_basedatos.setString(5, usuario_creado.contrasenia)
-        pasar_usuario_basedatos.executeUpdate()
-
-    }
-    conexion.close()
     return opcion
 
 }
@@ -165,7 +148,7 @@ fun iniciar_sesion(): String{
     var correo by remember { mutableStateOf("") }
     var contrasenia by remember { mutableStateOf("") }
 
-    val usuario=Usuario(correo, contrasenia)
+    val usuario=Usuario(correo, contrasenia) //usuario que le paso a la función
 
     //INTERFAZ GRÁFICA de iniciar_sesion
     BoxWithConstraints(
@@ -257,8 +240,8 @@ fun programa_tienda(){
     var ventana by remember { mutableStateOf("inicio") }
 
     when (ventana) {
-        "inicio" -> ventana=inicio()
-        "registrar" -> ventana=registrar()
+        "inicio" -> ventana=pagina_inicio()
+        "registrar" -> ventana=formulario_registro()
         "iniciar_sesion" -> ventana=iniciar_sesion()
         "menu_principal" -> ventana=menu_principal()
     }
@@ -266,8 +249,6 @@ fun programa_tienda(){
 fun main() = application {
     val titulo_ventana by remember { mutableStateOf("Melting Discos") }
     Window(onCloseRequest = ::exitApplication, title = titulo_ventana) {
-        //prueba()
-        //inicio()
        programa_tienda()
     }
 }

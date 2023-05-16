@@ -22,7 +22,7 @@ class Usuario(nombre:String, apellidos: String, dni: String, correo: String, con
     //constructor solo con contraseña y usuario para comprobar registros
     constructor(correo: String, contrasenia: String) : this("defecto", "defecto", "12345678C",correo, contrasenia)
 
-    //constructor por defecto
+    //constructor por defecto para crear usuarios "vacíos"
     constructor():this("defecto", "defecto", "12345678D", "defecto", "defecto")
 
     fun dar_disco_alta(){
