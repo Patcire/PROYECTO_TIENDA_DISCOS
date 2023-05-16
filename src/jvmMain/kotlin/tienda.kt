@@ -37,7 +37,7 @@ fun inicio():String {
         )
         {
             Row {
-                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "iniciar" }) {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "iniciar_sesion" }) {
                     Text("Iniciar sesión")
                 }
             } //FIN 1º ROW
@@ -157,24 +157,118 @@ fun registrar():String {
 
 }
 
-    @Preview
-    @Composable
-    fun programa_tienda(){
-        var ventana by remember { mutableStateOf("inicio") }
+@Composable
+@Preview
+fun iniciar_sesion(): String{
+    var opcion by remember { mutableStateOf("iniciar_sesion") }
 
-        when (ventana) {
-            "inicio" -> ventana=inicio()
-            "registrar" -> ventana=registrar()
+    var correo by remember { mutableStateOf("") }
+    var contrasenia by remember { mutableStateOf("") }
 
+    val usuario=Usuario(correo, contrasenia)
+
+    //INTERFAZ GRÁFICA de iniciar_sesion
+    BoxWithConstraints(
+        modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        {
+            Text("Correo", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = correo,
+                onValueChange = { correo = it },
+                label = { Text("Escriba su dirección de correo") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Text("Contraseña", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = contrasenia,
+                onValueChange = { contrasenia = it },
+                label = { Text("Escriba la contraseña") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Row() {
+                Button(
+                    modifier = Modifier.padding(5.dp),
+                    onClick = {
+                        if (comprobar_usuario(usuario)==true){
+                            opcion="menu_principal"
+                        }
+                    },
+
+                ) {
+                    Text("Entrar")
+                }
+            }
         }
-    }
+    } //fin box, FIN INTERFAZ GRÁFICA
 
-    fun main() = application {
-        val titulo_ventana by remember { mutableStateOf("Melting Discos") }
-        Window(onCloseRequest = ::exitApplication, title = titulo_ventana) {
-            //prueba()
-            //inicio()
-           programa_tienda()
-        }
+
+    return opcion
+}
+
+@Composable
+@Preview
+fun menu_principal(): String{
+    var opcion by remember { mutableStateOf("menu_principal") }
+
+    BoxWithConstraints(
+        modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
+    ) {
+        //var ancho_maximo=maxWidth.value.toInt()
+        //var altura_maxima=maxHeight.value.toInt()
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        {
+            Row {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "iniciar" }) {
+                    Text("op1")
+                }
+            } //FIN 1º ROW
+
+            Row {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "registrar" }) {
+                    Text("op2")
+                }
+            } //fin 2 row
+
+        } //fin columna
+    } //fin box
+
+    return opcion
+}
+
+
+
+@Preview
+@Composable
+fun programa_tienda(){
+    var ventana by remember { mutableStateOf("inicio") }
+
+    when (ventana) {
+        "inicio" -> ventana=inicio()
+        "registrar" -> ventana=registrar()
+        "iniciar_sesion" -> ventana=iniciar_sesion()
+        "menu_principal" -> ventana=menu_principal()
     }
+}
+fun main() = application {
+    val titulo_ventana by remember { mutableStateOf("Melting Discos") }
+    Window(onCloseRequest = ::exitApplication, title = titulo_ventana) {
+        //prueba()
+        //inicio()
+       programa_tienda()
+    }
+}
 
