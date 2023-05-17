@@ -1,3 +1,4 @@
+import CLASES.Disco
 import CLASES.Usuario
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
@@ -210,6 +211,68 @@ fun iniciar_sesion(): String{
 
 @Composable
 @Preview
+fun pagina_compra(): String{
+
+    var opcion by remember { mutableStateOf("comprar") }
+
+    var banda by remember { mutableStateOf("") }
+    var titulo by remember { mutableStateOf("") }
+
+    val disco= Disco(banda, titulo) //usuario que le paso a la función
+
+    var error by remember { mutableStateOf("") }
+
+    //INTERFAZ GRÁFICA pag compra
+    BoxWithConstraints(
+        modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        {
+            Text("ID", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = banda,
+                onValueChange = { banda = it },
+                label = { Text("ID del disco") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Text("Título", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = titulo,
+                onValueChange = { titulo = it },
+                label = { Text("Título del disco") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Text(error, modifier = Modifier.padding(bottom = 6.dp), color= Color.Red)
+            Row() {
+                Button(
+                    modifier = Modifier.padding(5.dp),
+                    onClick = {
+
+                        if (comprar(disco)==true){
+                            opcion="menu_principal"
+                        }
+                        else{
+                            error="Ese artista o disco no lo tenemos"
+                        }
+                    }
+                ) {
+                    Text("Comprar")
+                }
+            } // fin row del botón
+        } //fin columna
+    } //fin box, FIN INTERFAZ GRÁFICA
+
+    return opcion
+}
+
+@Composable
+@Preview
 fun menu_principal(): String{
     var opcion by remember { mutableStateOf("menu_principal") }
 
@@ -225,14 +288,14 @@ fun menu_principal(): String{
         )
         {
             Row {
-                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "iniciar" }) {
-                    Text("op1")
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "comprar" }) {
+                    Text("Comprar Discos")
                 }
             } //FIN 1º ROW
 
             Row {
-                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "registrar" }) {
-                    Text("op2")
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "ver" }) {
+                    Text("Ver Discos")
                 }
             } //fin 2 row
 
@@ -254,6 +317,7 @@ fun programa_tienda(){
         "registrar" -> ventana=formulario_registro()
         "iniciar_sesion" -> ventana=iniciar_sesion()
         "menu_principal" -> ventana=menu_principal()
+        "comprar" -> ventana=pagina_compra()
     }
 }
 fun main() = application {

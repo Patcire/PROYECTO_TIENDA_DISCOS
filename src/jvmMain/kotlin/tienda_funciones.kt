@@ -1,6 +1,6 @@
+import CLASES.Disco
 import CLASES.Usuario
 import java.sql.DriverManager
-import java.sql.ResultSet
 import java.sql.SQLException
 
 
@@ -68,6 +68,45 @@ fun comprobar_usuario(usuario_recibido: Usuario): Boolean{
             if (correo_devuelto==usuario_recibido.correo && contrasenia_devuelta==usuario_recibido.contrasenia){
                 respuesta=true
             }
+        }
+        conexion.close()
+    }
+    catch (e: SQLException) {
+        println("Error en la conexión: ${e.message}")
+    } catch (e: ClassNotFoundException) {
+        println("No se encontró el driver JDBC: ${e.message}")
+    }
+
+    return respuesta
+}
+
+fun comprar(disco: Disco): Boolean{
+    //Para conectarme a mi bbdd
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+    var respuesta=false // variable que almacena el return. Por defecto es false
+
+    try {
+        //establezco conexion
+        Class.forName("oracle.jdbc.driver.OracleDriver")
+        val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+        println("Conexión con ORACLE exitosa")
+
+        //CONSULTA Y COMPROBACIÓN CON EL USUARIO RECIBIDO
+
+        val consulta= "DELETE FROM DISCOS WHERE ID_DISCO=? AND TITULO=?"
+
+        val preparar_borrado = conexion.prepareStatement(consulta)
+        preparar_borrado.setString(1, disco.id)
+        preparar_borrado.setString(2, disco.titulo)
+
+        val orden_borrado = preparar_borrado.executeUpdate()
+        //executeupdate nos devuelve el num de filas que se han eliminado
+
+        if (orden_borrado==1){
+            respuesta=true
         }
         conexion.close()
     }
