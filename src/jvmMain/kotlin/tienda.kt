@@ -66,6 +66,8 @@ fun formulario_registro():String {
     var correo by remember { mutableStateOf("") }
     var contrasenia by remember { mutableStateOf("") }
 
+    var error by remember { mutableStateOf("") }
+    //con este mutable state haré que aparezca un mensaje de error
 
     val usuario_creado= Usuario(dni, nombre, apellidos, correo, contrasenia)
     //objeto tipo Usuario con el que vamos a mandar los datos a la BBDD
@@ -117,13 +119,16 @@ fun formulario_registro():String {
                 label = { Text("Escriba la contraseña") },
                 modifier = Modifier.padding(bottom = 6.dp)
             )
+            Text(error, modifier = Modifier.padding(bottom = 6.dp), color= Color.Red)
             Row() {
                 Button(
                     modifier = Modifier.padding(5.dp),
                     onClick = {
                         if (registrar_usuario(usuario_creado)==true){
                             opcion = "inicio"
+                            error=""
                         }
+                        else error="Error, el dni ya está usado por otra cuenta o alguno de los datos está incompleto"
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = androidx.compose.ui.graphics.Color.White,
@@ -132,9 +137,11 @@ fun formulario_registro():String {
                 ) {
                     Text("Enviar")
                 }
-            }
-        }
+            } //fin del row del botón
+        } //fin de la columna
+
     } //fin box, FIN INTERFAZ GRÁFICA
+
 
     return opcion
 
@@ -149,6 +156,8 @@ fun iniciar_sesion(): String{
     var contrasenia by remember { mutableStateOf("") }
 
     val usuario=Usuario(correo, contrasenia) //usuario que le paso a la función
+
+    var error by remember { mutableStateOf("") }
 
     //INTERFAZ GRÁFICA de iniciar_sesion
     BoxWithConstraints(
@@ -176,6 +185,7 @@ fun iniciar_sesion(): String{
                 label = { Text("Escriba la contraseña") },
                 modifier = Modifier.padding(bottom = 6.dp)
             )
+            Text(error, modifier = Modifier.padding(bottom = 6.dp), color= Color.Red)
             Row() {
                 Button(
                     modifier = Modifier.padding(5.dp),
@@ -183,13 +193,15 @@ fun iniciar_sesion(): String{
                         if (comprobar_usuario(usuario)==true){
                             opcion="menu_principal"
                         }
-                    },
-
+                        else{
+                            error="Correo y contraseña no coinciden o no existen"
+                        }
+                    }
                 ) {
                     Text("Entrar")
                 }
-            }
-        }
+            } // fin row del botón
+        } //fin columna
     } //fin box, FIN INTERFAZ GRÁFICA
 
 

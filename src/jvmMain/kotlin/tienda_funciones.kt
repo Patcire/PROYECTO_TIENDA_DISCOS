@@ -29,6 +29,7 @@ fun registrar_usuario(usuario_recibido: Usuario):Boolean{
     }
     catch (e: SQLException) {
          println("Error en la conexión: ${e.message}")
+        return false
     } catch (e: ClassNotFoundException) {
      println("No se encontró el driver JDBC: ${e.message}")
     }
