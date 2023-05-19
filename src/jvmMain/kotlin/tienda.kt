@@ -4,9 +4,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +45,11 @@ fun pagina_inicio():String {
             Row {
                 Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "registrar" }) {
                     Text("Registrarse")
+                }
+            } //fin 2 row
+            Row {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "actualizar" }) {
+                    Text("Actualizar usuario")
                 }
             } //fin 2 row
 
@@ -210,6 +213,106 @@ fun iniciar_sesion(): String{
     return opcion
 }
 
+
+@Composable
+@Preview
+fun formulario_actualizacion_usuario():String{
+    var opcion by remember { mutableStateOf("registrar") }
+
+    var dni by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
+    var apellidos by remember { mutableStateOf("") }
+    var correo by remember { mutableStateOf("") }
+    var contrasenia by remember { mutableStateOf("") }
+
+    var error by remember { mutableStateOf("") }
+    //con este mutable state haré que aparezca un mensaje de error
+
+    val usuario_creado= Usuario(dni, nombre, apellidos, correo, contrasenia)
+    //objeto tipo Usuario con el que vamos a mandar los datos a la BBDD
+
+    //INTERFAZ GRÁFICA de registrar
+    BoxWithConstraints(
+        modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .border(5.dp, Color.Black)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        {
+            Text("DNI DEL USUARIO A MODIFICAR", modifier = Modifier.padding(bottom = 8.dp))
+            OutlinedTextField(
+                value = dni,
+                onValueChange = { dni = it },
+                label = { Text("Introduzca su DNI") },
+                modifier = Modifier.padding(bottom = 6.dp).border(1.dp, Color.Black)
+            )
+        }
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ){
+            Text("Nombre", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = nombre,
+                onValueChange = { nombre = it },
+                label = { Text("Escriba su nombre") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Text("Apellidos", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = apellidos,
+                onValueChange = { apellidos = it },
+                label = { Text("Escriba sus apellidos") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Text("Correo", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = correo,
+                onValueChange = { correo = it },
+                label = { Text("Escriba su dirección de correo") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Text("Contraseña", modifier = Modifier.padding(bottom = 6.dp))
+            OutlinedTextField(
+                value = contrasenia,
+                onValueChange = { contrasenia = it },
+                label = { Text("Escriba la contraseña") },
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            Text(error, modifier = Modifier.padding(bottom = 6.dp), color= Color.Red)
+            Row() {
+                Button(
+                    modifier = Modifier.padding(5.dp),
+                    onClick = {
+                        if (registrar_usuario(usuario_creado)==true){
+                            opcion = "inicio"
+                            error=""
+                        }
+                        else error="Error, el dni ya está usado por otra cuenta o alguno de los datos está incompleto"
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = androidx.compose.ui.graphics.Color.White,
+                        contentColor = androidx.compose.ui.graphics.Color.Black
+                    )
+                ) {
+                    Text("Enviar")
+                }
+            } //fin del row del botón
+        } //fin de la columna
+
+    } //fin box, FIN INTERFAZ GRÁFICA
+
+    return opcion
+}
+
 @Composable
 @Preview
 fun pagina_compra(): String{
@@ -322,13 +425,12 @@ fun ver_cds():String{
     var posicion_cd by remember { mutableStateOf(0) }
 
 
-    val lista_info_completa_cds=mostrar_cds()
-    println(lista_info_completa_cds[0][0])
+    val lista_cds=mostrar_cds()
 
-    var id = lista_info_completa_cds[posicion_cd][0]
-    var banda = lista_info_completa_cds[posicion_cd][1]
-    var titulo = lista_info_completa_cds[posicion_cd][2]
-    var cod_descarga = lista_info_completa_cds[posicion_cd][3]
+    var id = ((lista_cds[posicion_cd]).id)
+    var banda = ((lista_cds[posicion_cd]).banda)
+    var titulo = ((lista_cds[posicion_cd]).titulo)
+    var cod_descarga = ((lista_cds[posicion_cd]).cod_descarga)
 
 
     //INTERFAZ GRÁFICA pag compra
@@ -354,7 +456,7 @@ fun ver_cds():String{
             Button(
                 modifier = Modifier.padding(5.dp),
                 onClick = {
-                    if (posicion_cd < lista_info_completa_cds.size-1) {
+                    if (posicion_cd < lista_cds.size-1) {
                         posicion_cd += 1
                     } else {
                         posicion_cd = 0
@@ -415,6 +517,7 @@ fun programa_tienda(){
     when (ventana) {
         "inicio" -> ventana=pagina_inicio()
         "registrar" -> ventana=formulario_registro()
+        "actualizar" -> ventana=formulario_actualizacion_usuario()
         "iniciar_sesion" -> ventana=iniciar_sesion()
         "menu_principal" -> ventana=menu_principal()
         "comprar" -> ventana=pagina_compra()

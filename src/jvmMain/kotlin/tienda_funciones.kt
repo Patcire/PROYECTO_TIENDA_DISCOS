@@ -164,7 +164,7 @@ fun mostrar_disco():MutableList<Disco>{
     return lista_discos
 }
 
-fun mostrar_cds():MutableList<MutableList<String>>{
+fun mostrar_cds():MutableList<CD>{
 
     //Para conectarme a mi bbdd
     val url = "jdbc:oracle:thin:@localhost:1521:xe"
@@ -172,11 +172,10 @@ fun mostrar_cds():MutableList<MutableList<String>>{
     val mi_contra = "tusuario2"
 
 
-    var lista_disco_info_general= mostrar_disco()
+    var lista_info_disco= mostrar_disco() //ejecuta esa función y me devuelve todos los discos
 
     var lista_cd= mutableListOf<CD>() //para almacenar los discos que me devuelva la consulta
 
-    var lista_completa= mutableListOf<MutableList<String>>() //almacenará los discos con todos los datos
     try {
         //establezco conexion
         Class.forName("oracle.jdbc.driver.OracleDriver")
@@ -188,17 +187,16 @@ fun mostrar_cds():MutableList<MutableList<String>>{
         val consulta_oracle="SELECT COD_DESC_DIGITAL, ID_DISCO  FROM CDS" //saco toda la info común a los discos
         val resultado_consulta= preparar_consulta.executeQuery(consulta_oracle)
 
-        //creo las variables que voy a querer almacenar de cada cd
-
-        var cod_descarga=""
-        var id=""
 
         while (resultado_consulta.next()) {
+            //creo las variables que voy a querer almacenar de cada cd
+            var cod_descarga=resultado_consulta.getString(1)
+            var id=resultado_consulta.getString(2)
 
-            cod_descarga=resultado_consulta.getString(1)
-            id=resultado_consulta.getString(2)
-            //almaceno la info de los discos en una lista
-            lista_cd.add(CD(cod_descarga, id))
+            //almaceno la info de los objetos en una lista mediante un objeto cd
+            lista_cd.add(CD(id, cod_descarga))
+            //cada resultado de la consulta lo almaceno en la lista gracias
+            //a este constructor con solo esos dos parámetros que ponía los otros x defecto
 
         }
         conexion.close()
@@ -209,26 +207,20 @@ fun mostrar_cds():MutableList<MutableList<String>>{
         println("No se encontró el driver JDBC: ${e.message}")
     }
 
-    var lista_catalogo= mutableListOf<MutableList<String>>()//incluye listas de string con la información de cada
-    //disco. No puede ser una lista de objetos Disco porque los atributos de la clase Padre, que es la clase Disco,
-    //no tiene los atributos únicos de cada subtipo que se recupera de la tabla subtipo
 
-    var lista_info_completa= mutableListOf<String>() //para almacenar la info completa de cada disco + sus atributos de la subtipo
-
-    for (disco in lista_disco_info_general){
-        for (cd in lista_cd){
+    //ahora combinando dos bucles que recorra ambas listas de objetos
+    for (cd in lista_cd){
+        for (disco in lista_info_disco){
             if (disco.id==cd.id){
-                lista_info_completa.add(0,disco.id)
-                lista_info_completa.add(1,disco.banda)
-                lista_info_completa.add(2, disco.titulo)
-                lista_info_completa.add(3, cd.cod_descarga)
-                lista_catalogo.add(lista_info_completa)
+                //si los ids son iguales actualiza estos parámetros que son los que estaban dados por defectos
+                //con el constructor secundario que se utilizó para almacenar primeramente los cds tras la consulta
+                cd.banda=disco.banda
+               cd.titulo=disco.titulo
             }
-            lista_info_completa=mutableListOf<String>() //la vacío para cargar el siguiente
         }
-
     }
 
-    return lista_catalogo
+
+    return lista_cd
 
 }
