@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import java.sql.DriverManager
 
 @Composable
 @Preview
@@ -45,11 +44,6 @@ fun pagina_inicio():String {
             Row {
                 Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "registrar" }) {
                     Text("Registrarse")
-                }
-            } //fin 2 row
-            Row {
-                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "actualizar" }) {
-                    Text("Actualizar usuario")
                 }
             } //fin 2 row
 
@@ -131,7 +125,6 @@ fun formulario_registro():String {
                     onClick = {
                         if (registrar_usuario(usuario_creado)==true){
                             opcion = "inicio"
-                            error=""
                         }
                         else error="Error, el dni ya está usado por otra cuenta o alguno de los datos está incompleto"
                     },
@@ -154,7 +147,7 @@ fun formulario_registro():String {
 
 @Composable
 @Preview
-fun iniciar_sesion(): String{
+fun iniciar_sesion(): MutableMap<String, String>{
     var opcion by remember { mutableStateOf("iniciar_sesion") }
 
     var correo by remember { mutableStateOf("") }
@@ -162,6 +155,7 @@ fun iniciar_sesion(): String{
 
     val usuario=Usuario(correo, contrasenia) //usuario que le paso a la función
 
+    var id_usuario_actual by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
 
     //INTERFAZ GRÁFICA de iniciar_sesion
@@ -195,12 +189,36 @@ fun iniciar_sesion(): String{
                 Button(
                     modifier = Modifier.padding(5.dp),
                     onClick = {
-                        if (comprobar_usuario(usuario)==true){
+                        //primero almacenamos el return de la función comprobar_usuario
+                        //Este return es una lista, cuya posicion 0 es el booleano true que cambie la ventana en el onclick
+                        // y ven la posicion 1 el id del usuario (su dni), que necesitamos almacenar durante la sesion activa
+                        //para saber que usuario está en sesión
+
+                        var lista_recibida=comprobar_usuario(usuario)
+
+                        if (lista_recibida[0]=="true"){ //el valor 0 de la lista recibida siempre va a ser el boolean.toString
                             opcion="menu_principal"
+                            id_usuario_actual=lista_recibida[1] //el valor 1 de la lista recibida siempre va a ser el dni
+                            println(id_usuario_actual)
                         }
                         else{
                             error="Correo y contraseña no coinciden o no existen"
                         }
+
+                        //sabemos que la posición 0 de la lista  es el booleano como cadena
+                        //y que la posicion 1
+
+                        /*
+                        if (comprobar_usuario(usuario)==true){
+                            opcion="menu_principal"
+                            //mapa_usuario_opcion["menu_principal"]=usuario
+                            //actualizo el usuario que hay asociado a la clave true
+                            //en lugar de añadir,
+                        }
+                        else{
+                            error="Correo y contraseña no coinciden o no existen"
+                        }
+                         */
                     }
                 ) {
                     Text("Entrar")
@@ -209,17 +227,17 @@ fun iniciar_sesion(): String{
         } //fin columna
     } //fin box, FIN INTERFAZ GRÁFICA
 
-
-    return opcion
+    val mapa_usuario_opcion= mutableMapOf<String, String>(opcion to id_usuario_actual)
+    return mapa_usuario_opcion
 }
 
 
 @Composable
 @Preview
-fun formulario_actualizacion_usuario():String{
-    var opcion by remember { mutableStateOf("registrar") }
+fun formulario_actualizacion_usuario(usuario_id: String):String{
+    var opcion by remember { mutableStateOf("actualizar") }
 
-    var dni by remember { mutableStateOf("") }
+    val dni_usuario_en_sesion=usuario_id
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
@@ -228,30 +246,13 @@ fun formulario_actualizacion_usuario():String{
     var error by remember { mutableStateOf("") }
     //con este mutable state haré que aparezca un mensaje de error
 
-    val usuario_creado= Usuario(dni, nombre, apellidos, correo, contrasenia)
+    val usuario_a_actualizar= Usuario(dni_usuario_en_sesion, nombre, apellidos, correo, contrasenia)
     //objeto tipo Usuario con el que vamos a mandar los datos a la BBDD
 
     //INTERFAZ GRÁFICA de registrar
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .border(5.dp, Color.Black)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        )
-        {
-            Text("DNI DEL USUARIO A MODIFICAR", modifier = Modifier.padding(bottom = 8.dp))
-            OutlinedTextField(
-                value = dni,
-                onValueChange = { dni = it },
-                label = { Text("Introduzca su DNI") },
-                modifier = Modifier.padding(bottom = 6.dp).border(1.dp, Color.Black)
-            )
-        }
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -292,11 +293,10 @@ fun formulario_actualizacion_usuario():String{
                 Button(
                     modifier = Modifier.padding(5.dp),
                     onClick = {
-                        if (registrar_usuario(usuario_creado)==true){
+                        if (actualir_usuario(usuario_a_actualizar)==true){
                             opcion = "inicio"
-                            error=""
                         }
-                        else error="Error, el dni ya está usado por otra cuenta o alguno de los datos está incompleto"
+                        else error="Alguno de los datos está incompleto o incumple el formato"
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = androidx.compose.ui.graphics.Color.White,
@@ -427,10 +427,10 @@ fun ver_cds():String{
 
     val lista_cds=mostrar_cds()
 
-    var id = ((lista_cds[posicion_cd]).id)
-    var banda = ((lista_cds[posicion_cd]).banda)
-    var titulo = ((lista_cds[posicion_cd]).titulo)
-    var cod_descarga = ((lista_cds[posicion_cd]).cod_descarga)
+    val id = ((lista_cds[posicion_cd]).id)
+    val banda = ((lista_cds[posicion_cd]).banda)
+    val titulo = ((lista_cds[posicion_cd]).titulo)
+    val cod_descarga = ((lista_cds[posicion_cd]).cod_descarga)
 
 
     //INTERFAZ GRÁFICA pag compra
@@ -498,11 +498,15 @@ fun menu_principal(): String{
                 Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "ver_productos" }) {
                     Text("Ver Discos")
                 }
-            } //fin 2 row
+            } //fin 2º row
+            Row {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "actualizar" }) {
+                    Text("Actualizar usuario")
+                }
+            } //fin 3º row
 
         } //fin columna
     } //fin box
-
 
     return opcion
 }
@@ -513,12 +517,27 @@ fun menu_principal(): String{
 @Composable
 fun programa_tienda(){
     var ventana by remember { mutableStateOf("inicio") }
+    var dni_usuario_en_sesion by remember { mutableStateOf("") }
 
     when (ventana) {
         "inicio" -> ventana=pagina_inicio()
         "registrar" -> ventana=formulario_registro()
-        "actualizar" -> ventana=formulario_actualizacion_usuario()
-        "iniciar_sesion" -> ventana=iniciar_sesion()
+        "iniciar_sesion" -> {
+            val info_recibida=iniciar_sesion() //nos devuelve un mapa <String, String> donde el KEY
+            // es el string que nos dice si permanecemos o cambiamos de ventanada y el VALUE es el dni del usuario en sesión
+            for ((clave, valor) in info_recibida){
+                ventana=clave
+                dni_usuario_en_sesion=valor
+            }
+        }
+        "actualizar" -> {
+            val info_recibida=iniciar_sesion() //el mapa con el nuevo valor de ventana (KEY)
+            // y el id/dni del usuario en sesión (VALUE)
+            for ((clave, valor) in info_recibida){
+                ventana=clave
+            }
+            ventana=formulario_actualizacion_usuario(dni_usuario_en_sesion)
+        }
         "menu_principal" -> ventana=menu_principal()
         "comprar" -> ventana=pagina_compra()
         "ver_productos" -> ventana=opciones_ver_discos()

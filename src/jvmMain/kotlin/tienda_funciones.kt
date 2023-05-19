@@ -38,14 +38,22 @@ fun registrar_usuario(usuario_recibido: Usuario):Boolean{
 
 
 
-fun comprobar_usuario(usuario_recibido: Usuario): Boolean{
+fun comprobar_usuario(usuario_recibido: Usuario): MutableList <String> {
 
     //Para conectarme a mi bbdd
     val url = "jdbc:oracle:thin:@localhost:1521:xe"
     val mi_usuario = "usuariot"
     val mi_contra = "tusuario2"
 
-    var respuesta=false // variable que almacena el return. Por defecto es false
+    var respuesta = false // variable que almacena el return. Por defecto es false
+
+    var dni_devuelto = "" //almacenará el id del objeto usuario que devuelve luego la consulta
+    //no es necesario para hacer la comprobación ya que el correo ya es único, pero lo vamos a devolver
+    //para almacenarlo durante la sesión y que ese usuario solo pueda actualizarse a sí mismo
+
+
+    var lista_respuesta_dni = mutableListOf<String>(respuesta.toString(), dni_devuelto)
+
     try {
         //establezco conexion
         Class.forName("oracle.jdbc.driver.OracleDriver")
@@ -54,29 +62,37 @@ fun comprobar_usuario(usuario_recibido: Usuario): Boolean{
 
         //CONSULTA Y COMPROBACIÓN CON EL USUARIO RECIBIDO
         val preparar_consulta = conexion.createStatement()
-        val consulta_oracle="SELECT CORREO, CONTRASENIA FROM USUARIOS WHERE CORREO= '${usuario_recibido.correo}'"
-        val resultado_consulta= preparar_consulta.executeQuery(consulta_oracle)
+        val consulta_oracle = "SELECT CORREO, CONTRASENIA, DNI FROM USUARIOS WHERE CORREO= '${usuario_recibido.correo}'"
+        val resultado_consulta = preparar_consulta.executeQuery(consulta_oracle)
+
 
         while (resultado_consulta.next()) {
 
             val correo_devuelto = resultado_consulta.getString("CORREO") //columna correo
-            println(correo_devuelto)
-            val contrasenia_devuelta = resultado_consulta.getString("CONTRASENIA") //columna contraseña
-            println(contrasenia_devuelta)
+            println(correo_devuelto) //este print ese solo para la terminal, para comprobar que se ha recuperado bien la info
 
-            if (correo_devuelto==usuario_recibido.correo && contrasenia_devuelta==usuario_recibido.contrasenia){
-                respuesta=true
+            val contrasenia_devuelta = resultado_consulta.getString("CONTRASENIA") //columna contraseña
+            println(contrasenia_devuelta) //este print ese solo para la terminal, para comprobar que se ha recuperado bien la info
+
+            dni_devuelto = resultado_consulta.getString("DNI")
+            println(dni_devuelto) //este print ese solo para la terminal, para comprobar que se ha recuperado bien la info
+
+            if (correo_devuelto == usuario_recibido.correo && contrasenia_devuelta == usuario_recibido.contrasenia) {
+                lista_respuesta_dni.add(0, true.toString())
+                lista_respuesta_dni.add(1, dni_devuelto)
             }
+
         }
         conexion.close()
     }
-    catch (e: SQLException) {
-        println("Error en la conexión: ${e.message}")
-    } catch (e: ClassNotFoundException) {
-        println("No se encontró el driver JDBC: ${e.message}")
-    }
+        catch(e: SQLException) {
+            println("Error en la conexión: ${e.message}")
+        } catch (e: ClassNotFoundException) {
+            println("No se encontró el driver JDBC: ${e.message}")
+        }
 
-    return respuesta
+        return lista_respuesta_dni
+
 }
 
 fun comprar(disco: Disco): Boolean{
@@ -222,5 +238,49 @@ fun mostrar_cds():MutableList<CD>{
 
 
     return lista_cd
+
+}
+
+fun actualir_usuario(usuario_actualizar: Usuario): Boolean {
+    //PARA CONECTARSE A ORACLE
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+    var respuesta=false //por defecto devuelve false, para que no cambie de ventana
+
+    try {
+        Class.forName("oracle.jdbc.driver.OracleDriver")
+        val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+        println("Conexión con ORACLE exitosa")
+
+        val actualizar_usuario_basedatos = conexion.prepareStatement(
+            "UPDATE USUARIOS SET NOMBRE='${usuario_actualizar.nombre}'," +
+                    " APELLIDOS='${usuario_actualizar.apellidos}', CORREO='${usuario_actualizar.correo}', " +
+                    "CONTRASENIA='${usuario_actualizar.contrasenia}'" +
+                    "WHERE dni='${usuario_actualizar.dni}'")
+
+        val filas_actualizadas = actualizar_usuario_basedatos.executeUpdate() //ejecuta el update
+        // y almacena cuantas filas han sido actualizadas
+
+        if (filas_actualizadas==1) {
+            println("Registro actualizado correctamente")
+            respuesta=true
+        }
+        else{
+            println("error en el update")
+        }
+
+        actualizar_usuario_basedatos.close()
+        conexion.close()
+    }
+    catch (e: SQLException) {
+        println("Error en la conexión: ${e.message}")
+        respuesta= false
+    } catch (e: ClassNotFoundException) {
+        println("No se encontró el driver JDBC: ${e.message}")
+    }
+
+    return respuesta
 
 }
