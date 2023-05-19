@@ -2,6 +2,7 @@ import CLASES.Disco
 import CLASES.Usuario
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -273,6 +274,104 @@ fun pagina_compra(): String{
 
 @Composable
 @Preview
+fun opciones_ver_discos():String{
+    var opcion by remember { mutableStateOf("ver_productos") }
+
+
+    BoxWithConstraints(
+        modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        {
+            Row {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "ver_cds" }) {
+                    Text("Ver CDs")
+                }
+            } //FIN 1º ROW
+
+            Row {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "ver_vinilos" }) {
+                    Text("Ver Vinilos")
+                }
+            } //fin 2 row
+            Row {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "ver_cassettes" }) {
+                    Text("Ver Cassettes")
+                }
+            } //fin 2 row
+
+        } //fin columna
+    } //fin box
+
+    return opcion
+}
+
+@Composable
+@Preview
+fun ver_cds():String{
+
+
+    var opcion by remember { mutableStateOf("ver_cds") }
+
+    var posicion_cd by remember { mutableStateOf(0) }
+
+
+    val lista_info_completa_cds=mostrar_cds()
+    println(lista_info_completa_cds[0][0])
+
+    var id = lista_info_completa_cds[posicion_cd][0]
+    var banda = lista_info_completa_cds[posicion_cd][1]
+    var titulo = lista_info_completa_cds[posicion_cd][2]
+    var cod_descarga = lista_info_completa_cds[posicion_cd][3]
+
+
+    //INTERFAZ GRÁFICA pag compra
+    BoxWithConstraints(
+        modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .border(1.dp, Color.Black)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        
+        {
+            Text("ID: $id", modifier = Modifier.padding(bottom = 6.dp))
+            Text("Banda: $banda", modifier = Modifier.padding(bottom = 6.dp))
+            Text("Título: $titulo", modifier = Modifier.padding(bottom = 6.dp))
+            Text("Código de descarga:: $cod_descarga", modifier = Modifier.padding(bottom = 6.dp))
+        }
+        Row() {
+            Button(
+                modifier = Modifier.padding(5.dp),
+                onClick = {
+                    if (posicion_cd < lista_info_completa_cds.size-1) {
+                        posicion_cd += 1
+                    } else {
+                        posicion_cd = 0
+                    }
+                }
+            ) {
+                Text("Siguiente")
+            }
+        }
+    }
+
+    return opcion
+
+}
+
+@Composable
+@Preview
 fun menu_principal(): String{
     var opcion by remember { mutableStateOf("menu_principal") }
 
@@ -294,13 +393,14 @@ fun menu_principal(): String{
             } //FIN 1º ROW
 
             Row {
-                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "ver" }) {
+                Button(modifier = Modifier.padding(5.dp), onClick = { opcion = "ver_productos" }) {
                     Text("Ver Discos")
                 }
             } //fin 2 row
 
         } //fin columna
     } //fin box
+
 
     return opcion
 }
@@ -318,6 +418,8 @@ fun programa_tienda(){
         "iniciar_sesion" -> ventana=iniciar_sesion()
         "menu_principal" -> ventana=menu_principal()
         "comprar" -> ventana=pagina_compra()
+        "ver_productos" -> ventana=opciones_ver_discos()
+        "ver_cds" -> ventana=ver_cds()
     }
 }
 fun main() = application {

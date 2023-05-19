@@ -1,5 +1,4 @@
-import CLASES.Disco
-import CLASES.Usuario
+import CLASES.*
 import java.sql.DriverManager
 import java.sql.SQLException
 
@@ -117,4 +116,119 @@ fun comprar(disco: Disco): Boolean{
     }
 
     return respuesta
+}
+
+
+fun mostrar_disco():MutableList<Disco>{
+    //con esta lista saco la información común a los discos independientementes del tipo que sean
+
+    var lista_discos= mutableListOf<Disco>() //esta lista almacenaré la info de la consulta y la pasaré
+    //a las funciones de obtener info por cada tipo
+
+    //Para conectarme a mi bbdd
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+    try {
+        //establezco conexion
+        Class.forName("oracle.jdbc.driver.OracleDriver")
+        val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+        println("Conexión con ORACLE exitosa")
+
+        //CONSULTA para sacar datos de todos los discos
+        val preparar_consulta = conexion.createStatement()
+        val consulta_oracle="SELECT ID_DISCO, NOMBRE_BANDA, TITULO  FROM DISCOS"
+        //saco toda la info común a los discos
+
+        val resultado_consulta= preparar_consulta.executeQuery(consulta_oracle)
+
+        while (resultado_consulta.next()) {
+
+            var id=resultado_consulta.getString(1)
+            var banda=resultado_consulta.getString(2)
+            var titulo=resultado_consulta.getString(3)
+
+            //almaceno la info de los discos en una lista
+            lista_discos.add(Disco(id, banda, titulo ))
+
+        }
+        conexion.close()
+    }
+    catch (e: SQLException) {
+        println("Error en la conexión: ${e.message}")
+    } catch (e: ClassNotFoundException) {
+        println("No se encontró el driver JDBC: ${e.message}")
+    }
+
+    return lista_discos
+}
+
+fun mostrar_cds():MutableList<MutableList<String>>{
+
+    //Para conectarme a mi bbdd
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+
+    var lista_disco_info_general= mostrar_disco()
+
+    var lista_cd= mutableListOf<CD>() //para almacenar los discos que me devuelva la consulta
+
+    var lista_completa= mutableListOf<MutableList<String>>() //almacenará los discos con todos los datos
+    try {
+        //establezco conexion
+        Class.forName("oracle.jdbc.driver.OracleDriver")
+        val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+        println("Conexión con ORACLE exitosa")
+
+        //CONSULTA para sacar datos de los cds
+        val preparar_consulta = conexion.createStatement()
+        val consulta_oracle="SELECT COD_DESC_DIGITAL, ID_DISCO  FROM CDS" //saco toda la info común a los discos
+        val resultado_consulta= preparar_consulta.executeQuery(consulta_oracle)
+
+        //creo las variables que voy a querer almacenar de cada cd
+
+        var cod_descarga=""
+        var id=""
+
+        while (resultado_consulta.next()) {
+
+            cod_descarga=resultado_consulta.getString(1)
+            id=resultado_consulta.getString(2)
+            //almaceno la info de los discos en una lista
+            lista_cd.add(CD(cod_descarga, id))
+
+        }
+        conexion.close()
+    }
+    catch (e: SQLException) {
+        println("Error en la conexión: ${e.message}")
+    } catch (e: ClassNotFoundException) {
+        println("No se encontró el driver JDBC: ${e.message}")
+    }
+
+    var lista_catalogo= mutableListOf<MutableList<String>>()//incluye listas de string con la información de cada
+    //disco. No puede ser una lista de objetos Disco porque los atributos de la clase Padre, que es la clase Disco,
+    //no tiene los atributos únicos de cada subtipo que se recupera de la tabla subtipo
+
+    var lista_info_completa= mutableListOf<String>() //para almacenar la info completa de cada disco + sus atributos de la subtipo
+
+    for (disco in lista_disco_info_general){
+        for (cd in lista_cd){
+            if (disco.id==cd.id){
+                lista_info_completa.add(0,disco.id)
+                lista_info_completa.add(1,disco.banda)
+                lista_info_completa.add(2, disco.titulo)
+                lista_info_completa.add(3, cd.cod_descarga)
+                lista_catalogo.add(lista_info_completa)
+            }
+            lista_info_completa=mutableListOf<String>() //la vacío para cargar el siguiente
+        }
+
+    }
+
+    return lista_catalogo
+
 }

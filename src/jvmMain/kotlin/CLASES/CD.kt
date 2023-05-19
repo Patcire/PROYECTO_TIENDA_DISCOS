@@ -8,4 +8,6 @@ class CD: Disco{
         this.cod_descarga=cod_descarga
     }
 
+    //constructor solo con código DE DESCARGA
+    constructor(cod_descarga:String, id: String):super(id, "defecto", "defecto")
 }
