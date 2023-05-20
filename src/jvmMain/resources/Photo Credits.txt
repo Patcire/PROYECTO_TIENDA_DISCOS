@@ -1,0 +1,13 @@
+Este es un trabajo realizado para la asignatura de Programación 
+de 1º de Diseño de Aplicaciones Web. Solo tiene fin educativo.
+
+Las imágenes están descargadas de pexels.com,
+son de uso libre y aquí están los créditos y enlaces de las mismas:
+
+Foto de Tima Miroshnichenko de Pexels: https://www.pexels.com/es-es/foto/moda-hombre-mujer-navegando-6827191/
+Foto de Tima Miroshnichenko: https://www.pexels.com/es-es/foto/moda-mujer-bailando-musica-6827396/
+Foto de Markus Spiske: https://www.pexels.com/es-es/foto/vintage-musica-sonar-retro-92083/
+Foto de Karolina Grabowska: https://www.pexels.com/es-es/foto/cuaderno-tecnologia-auriculares-telefono-5208345/
+
+
+(20/05/2023)

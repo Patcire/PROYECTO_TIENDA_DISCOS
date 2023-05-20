@@ -30,8 +30,12 @@ fun pagina_inicio():String {
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
-        //var ancho_maximo=maxWidth.value.toInt()
-        //var altura_maxima=maxHeight.value.toInt()
+        Image(
+            painter = painterResource("pexels-tima-miroshnichenko-6827191.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -80,6 +84,12 @@ fun formulario_registro():String {
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
+        Image(
+            painter = painterResource("pexels-karolina-grabowska-5208345.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -177,6 +187,12 @@ fun iniciar_sesion(): MutableMap<String, String>{
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
+        Image(
+            painter = painterResource("pexels-karolina-grabowska-5208345.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -264,6 +280,12 @@ fun formulario_actualizacion_usuario(usuario_id: String):String{
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
+        Image(
+            painter = painterResource("pexels-karolina-grabowska-5208345.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -351,6 +373,12 @@ fun pagina_compra(): String{
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
+        Image(
+            painter = painterResource("pexels-karolina-grabowska-5208345.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -415,6 +443,12 @@ fun opciones_ver_discos():String{
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
+        Image(
+            painter = painterResource("pexels-karolina-grabowska-5208345.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -607,6 +641,12 @@ fun ver_cassettes():String{
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
+        Image(
+            painter = painterResource("pexels-markus-spiske-92083.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -659,6 +699,12 @@ fun menu_principal(): String{
     BoxWithConstraints(
         modifier = Modifier.background(Color.LightGray).fillMaxWidth().fillMaxHeight()
     ) {
+        Image(
+            painter = painterResource("pexels-tima-miroshnichenko-6827396.jpg"),
+            contentDescription = "image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         Column(
             modifier = Modifier
                 .padding(16.dp)
