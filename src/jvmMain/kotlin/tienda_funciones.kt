@@ -241,7 +241,122 @@ fun mostrar_cds():MutableList<CD>{
 
 }
 
-fun actualir_usuario(usuario_actualizar: Usuario): Boolean {
+fun mostrar_vinilos():MutableList<Vinilo>{
+    //Para conectarme a mi bbdd
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+
+    var lista_info_disco= mostrar_disco() //ejecuta esa función y me devuelve todos los discos
+
+    var lista_vinilos= mutableListOf<Vinilo>() //para almacenar los discos que me devuelva la consulta
+
+    try {
+        //establezco conexion
+        Class.forName("oracle.jdbc.driver.OracleDriver")
+        val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+        println("Conexión con ORACLE exitosa")
+
+        //CONSULTA para sacar datos de los cds
+        val preparar_consulta = conexion.createStatement()
+        val consulta_oracle="SELECT PULGADAS, ID_DISCO  FROM VINILOS" //saco toda la info común a los discos
+        val resultado_consulta= preparar_consulta.executeQuery(consulta_oracle)
+
+
+        while (resultado_consulta.next()) {
+            //creo las variables que voy a querer almacenar de cada cd
+            var pulgadas=resultado_consulta.getInt(1)
+            var id=resultado_consulta.getString(2)
+
+            //almaceno la info de los objetos en una lista mediante un objeto vinilo
+            lista_vinilos.add(Vinilo(id, pulgadas))
+            //cada resultado de la consulta lo almaceno en la lista gracias
+            //a este constructor con solo esos dos parámetros que ponía los otros x defecto
+
+        }
+        conexion.close()
+    }
+    catch (e: SQLException) {
+        println("Error en la conexión: ${e.message}")
+    } catch (e: ClassNotFoundException) {
+        println("No se encontró el driver JDBC: ${e.message}")
+    }
+
+
+    //ahora combinando dos bucles que recorra ambas listas de objetos
+    for (vinilo in lista_vinilos){
+        for (disco in lista_info_disco){
+            if (disco.id==vinilo.id){
+                //si los ids son iguales actualiza estos parámetros que son los que estaban dados por defectos
+                //con el constructor secundario que se utilizó para almacenar primeramente los vnilos tras la consulta
+                vinilo.banda=disco.banda
+                vinilo.titulo=disco.titulo
+            }
+        }
+    }
+
+
+    return lista_vinilos
+
+}
+fun mostrar_cassettes():MutableList<Cassette>{
+    //Para conectarme a mi bbdd
+    val url = "jdbc:oracle:thin:@localhost:1521:xe"
+    val mi_usuario = "usuariot"
+    val mi_contra = "tusuario2"
+
+
+    var lista_info_disco= mostrar_disco() //ejecuta esa función y me devuelve la info de todos los discos
+
+    var lista_cassettes= mutableListOf<Cassette>() //para almacenar los cassettes que me devuelva la consulta
+
+    try {
+        //establezco conexion
+        Class.forName("oracle.jdbc.driver.OracleDriver")
+        val conexion = DriverManager.getConnection(url, mi_usuario, mi_contra)
+        println("Conexión con ORACLE exitosa")
+
+        //CONSULTA para sacar datos de los cds
+        val preparar_consulta = conexion.createStatement()
+        val consulta_oracle="SELECT SEGUNDA_MANO, ID_DISCO  FROM CASSETTES" //saco toda la info común a los discos
+        val resultado_consulta= preparar_consulta.executeQuery(consulta_oracle)
+
+
+        while (resultado_consulta.next()) {
+            //creo las variables que voy a querer almacenar de cada cd
+            var segunda_mano=resultado_consulta.getString(1)
+            var id=resultado_consulta.getString(2)
+
+            //almaceno la info de los objetos en una lista mediante un objeto cassette
+            lista_cassettes.add(Cassette(id, segunda_mano))
+            //cada resultado de la consulta lo almaceno en la lista gracias
+            //a este constructor con solo esos dos parámetros que ponía los otros x defecto
+
+        }
+        conexion.close()
+    }
+    catch (e: SQLException) {
+        println("Error en la conexión: ${e.message}")
+    } catch (e: ClassNotFoundException) {
+        println("No se encontró el driver JDBC: ${e.message}")
+    }
+
+
+    //ahora combinando dos bucles que recorra ambas listas de objetos
+    for (cassette in lista_cassettes){
+        for (disco in lista_info_disco){
+            if (disco.id==cassette.id){
+                //si los ids son iguales actualiza estos parámetros que son los que estaban dados por defectos
+                //con el constructor secundario que se utilizó para almacenar primeramente los cassettes tras la consulta
+                cassette.banda=disco.banda
+                cassette.titulo=disco.titulo
+            }
+        }
+    }
+    return lista_cassettes
+}
+fun actualizar_usuario(usuario_actualizar: Usuario): Boolean {
     //PARA CONECTARSE A ORACLE
     val url = "jdbc:oracle:thin:@localhost:1521:xe"
     val mi_usuario = "usuariot"
